@@ -1,15 +1,15 @@
-import com.typesafe.sbt.packager.docker.{Cmd, LayeredMapping}
+import java.nio.file.Paths
+
 import sbt.*
 import sbt.Keys.*
 
-import java.nio.file.Paths
+import com.typesafe.sbt.packager.docker.{Cmd, LayeredMapping}
 
 ThisBuild / credentials += Credentials(
   "GitHub Package Registry",
   "maven.pkg.github.com",
   "raw-labs",
-  sys.env.getOrElse("GITHUB_TOKEN", "")
-)
+  sys.env.getOrElse("GITHUB_TOKEN", ""))
 
 lazy val commonSettings = Seq(
   homepage := Some(url("https://www.raw-labs.com/")),
@@ -19,17 +19,11 @@ lazy val commonSettings = Seq(
   // Use cached resolution of dependencies
   // http://www.scala-sbt.org/0.13/docs/Cached-Resolution.html
   updateOptions := updateOptions.in(Global).value.withCachedResolution(true),
-  resolvers += "RAW Labs GitHub Packages" at "https://maven.pkg.github.com/raw-labs/_"
-)
+  resolvers += "RAW Labs GitHub Packages" at "https://maven.pkg.github.com/raw-labs/_")
 
 lazy val buildSettings = Seq(
   scalaVersion := "2.13.15",
-  javacOptions ++= Seq(
-    "-source",
-    "21",
-    "-target",
-    "21"
-  ),
+  javacOptions ++= Seq("-source", "21", "-target", "21"),
   scalacOptions ++= Seq(
     "-feature",
     "-unchecked",
@@ -38,9 +32,7 @@ lazy val buildSettings = Seq(
     "-Ywarn-dead-code",
     "-Ywarn-macros:after", // Fix for false warning of unused implicit arguments in traits/interfaces.
     "-Ypatmat-exhaust-depth",
-    "160"
-  )
-)
+    "160"))
 
 lazy val compileSettings = Seq(
   Compile / doc / sources := Seq.empty,
@@ -48,17 +40,15 @@ lazy val compileSettings = Seq(
   Compile / packageSrc / publishArtifact := true,
   Compile / packageDoc / publishArtifact := false,
   Compile / packageBin / packageOptions += Package.ManifestAttributes(
-    "Automatic-Module-Name" -> name.value.replace('-', '.')
-  ),
+    "Automatic-Module-Name" -> name.value.replace('-', '.')),
   // Ensure Java annotations get compiled first, so that they are accessible from Scala.
-  compileOrder := CompileOrder.JavaThenScala
-)
+  compileOrder := CompileOrder.JavaThenScala)
 
 lazy val testSettings = Seq(
   // Ensuring tests are run in a forked JVM for isolation.
   Test / fork := true,
   // Disabling parallel execution of tests.
-  //Test / parallelExecution := false,
+  // Test / parallelExecution := false,
   // Pass system properties starting with "raw." to the forked JVMs.
   Test / javaOptions ++= {
     import scala.collection.JavaConverters.*
@@ -73,10 +63,8 @@ lazy val testSettings = Seq(
   // Set up heap dump options for out-of-memory errors.
   Test / javaOptions ++= Seq(
     "-XX:+HeapDumpOnOutOfMemoryError",
-    s"-XX:HeapDumpPath=${Paths.get(sys.env.getOrElse("SBT_FORK_OUTPUT_DIR", "target/test-results")).resolve("heap-dumps")}"
-  ),
-  Test / publishArtifact := true
-)
+    s"-XX:HeapDumpPath=${Paths.get(sys.env.getOrElse("SBT_FORK_OUTPUT_DIR", "target/test-results")).resolve("heap-dumps")}"),
+  Test / publishArtifact := true)
 
 val isCI = sys.env.getOrElse("CI", "false").toBoolean
 
@@ -85,14 +73,10 @@ lazy val publishSettings = Seq(
   publish / skip := false,
   publishMavenStyle := true,
   publishTo := Some("GitHub raw-labs Apache Maven Packages" at "https://maven.pkg.github.com/raw-labs/das-excel"),
-  publishConfiguration := publishConfiguration.value.withOverwrite(isCI)
-)
+  publishConfiguration := publishConfiguration.value.withOverwrite(isCI))
 
-lazy val strictBuildSettings = commonSettings ++ compileSettings ++ buildSettings ++ testSettings ++ Seq(
-  scalacOptions ++= Seq(
-    "-Xfatal-warnings"
-  )
-)
+lazy val strictBuildSettings =
+  commonSettings ++ compileSettings ++ buildSettings ++ testSettings ++ Seq(scalacOptions ++= Seq("-Xfatal-warnings"))
 
 lazy val root = (project in file("."))
   .settings(
@@ -105,8 +89,8 @@ lazy val root = (project in file("."))
       // Apache POI for reading Excel files
       "org.apache.poi" % "poi" % "5.2.3",
       "org.apache.poi" % "poi-ooxml" % "5.2.3",
-    )
-  )
+      // Scalatest
+      "org.scalatest" %% "scalatest" % "3.2.19" % "test"))
 
 val amzn_jdk_version = "21.0.4.7-1"
 val amzn_corretto_bin = s"java-21-amazon-corretto-jdk_${amzn_jdk_version}_amd64.deb"
@@ -119,8 +103,7 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
     "vendor" -> "RAW Labs SA",
     "product" -> "das-excel-server",
     "image-type" -> "final",
-    "org.opencontainers.image.source" -> "https://github.com/raw-labs/das-excel"
-  ),
+    "org.opencontainers.image.source" -> "https://github.com/raw-labs/das-excel"),
   Docker / daemonUser := "raw",
   dockerExposedVolumes := Seq("/var/log/raw"),
   dockerExposedPorts := Seq(50051),
@@ -128,8 +111,8 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
   // We remove the automatic switch to USER 1001:0.
   // We we want to run as root to install the JDK, also later we will switch to a non-root user.
   dockerCommands := dockerCommands.value.filterNot {
-    case Cmd("USER", args@_*) => args.contains("1001:0")
-    case cmd => false
+    case Cmd("USER", args @ _*) => args.contains("1001:0")
+    case cmd                    => false
   },
   dockerCommands ++= Seq(
     Cmd(
@@ -142,13 +125,8 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
       && dpkg --install $amzn_corretto_bin \\
       && rm -f $amzn_corretto_bin \\
       && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \\
-          wget gnupg software-properties-common"""
-    ),
-    Cmd(
-      "USER",
-      "raw"
-    )
-  ),
+          wget gnupg software-properties-common"""),
+    Cmd("USER", "raw")),
   dockerEnvVars += "LANG" -> "C.UTF-8",
   dockerEnvVars += "JAVA_HOME" -> "/usr/lib/jvm/java-21-amazon-corretto",
   Compile / doc / sources := Seq.empty, // Do not generate scaladocs
@@ -162,11 +140,11 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
       case ClasspathPattern(classpath) => s"""
                                              |declare -r app_classpath="$${app_home}/../conf:$classpath"
                                              |""".stripMargin
-      case _@entry => entry
+      case _ @entry => entry
     }
   },
   Docker / dockerLayerMappings := (Docker / dockerLayerMappings).value.map {
-    case lm@LayeredMapping(Some(1), file, path) => {
+    case lm @ LayeredMapping(Some(1), file, path) => {
       val fileName = java.nio.file.Paths.get(path).getFileName.toString
       if (!fileName.endsWith(".jar")) {
         // If it is not a jar, put it on the top layer. Configuration files and other small files.
@@ -179,7 +157,7 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
         lm
       }
     }
-    case lm@_ => lm
+    case lm @ _ => lm
   },
   Compile / mainClass := Some("com.rawlabs.das.server.DASServer"),
   Docker / dockerAutoremoveMultiStageIntermediateImages := false,
@@ -190,22 +168,15 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
     val baseAlias = dockerAlias.value.withRegistryHost(Some(devRegistry))
 
     releaseRegistry match {
-      case Some(releaseReg) => Seq(
-        baseAlias,
-        dockerAlias.value.withRegistryHost(Some(releaseReg))
-      )
-      case None => Seq(baseAlias)
+      case Some(releaseReg) => Seq(baseAlias, dockerAlias.value.withRegistryHost(Some(releaseReg)))
+      case None             => Seq(baseAlias)
     }
-  }
-)
+  })
 
 lazy val docker = (project in file("docker"))
-  .dependsOn(
-    root % "compile->compile;test->test"
-  )
+  .dependsOn(root % "compile->compile;test->test")
   .enablePlugins(JavaAppPackaging, DockerPlugin)
   .settings(
     strictBuildSettings,
     dockerSettings,
-    libraryDependencies += "com.raw-labs" %% "das-server-scala" % "0.3.0" % "compile->compile;test->test"
-  )
+    libraryDependencies += "com.raw-labs" %% "das-server-scala" % "0.3.0" % "compile->compile;test->test")

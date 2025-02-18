@@ -12,7 +12,7 @@
 
 package com.rawlabs.das.excel
 
-import com.rawlabs.das.sdk.scala.{DASFunction, DASSdk, DASTable}
+import com.rawlabs.das.sdk.scala.{DASFunction, DASSdk}
 import com.rawlabs.protocol.das.v1.functions.FunctionDefinition
 import com.rawlabs.protocol.das.v1.tables.TableDefinition
 import com.typesafe.scalalogging.StrictLogging
@@ -46,7 +46,7 @@ class DASExcel(options: Map[String, String]) extends DASSdk with StrictLogging {
   /**
    * Lookup by name. Return the matching table if any.
    */
-  override def getTable(name: String): Option[DASTable] = {
+  override def getTable(name: String): Option[DASExcelTable] = {
     allTables.find(_.tableConfig.name == name)
   }
 
