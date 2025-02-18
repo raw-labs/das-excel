@@ -198,7 +198,6 @@ class DASExcelTable(connector: DASExcelConnector, val tableConfig: ExcelTableCon
       return ""
     }
     // 1) find if cIdx in a merged region
-//    val cell = rowObj.getCell(cIdx, Row.MissingCellPolicy.RETURN_NULL_AND_BLANK)
     val (topRow, leftCol) = findTopLeftOfMerged(rowObj.getRowNum, cIdx, merges)
 
     // That top-left cell is the “real” source of content
