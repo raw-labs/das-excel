@@ -5,9 +5,19 @@
 
 ## Options
 
-| Name                  | Description                       | Default | Required |
-|-----------------------|-----------------------------------|---------|----------|
-| `...`                 | ...                               |         | Yes      |
+| Name             | Description                                                                          | Default | Required |
+|------------------|--------------------------------------------------------------------------------------|---------|----------|
+| `nr_tables`      | The number of Excel tables in the file to Expose                                     |         | Yes      |
+| `filename`       | The path to the Excel file to expose                                                 |         | Yes      |
+| `table0_name`    | The name for the first table                                                         |         | Yes      |
+| `table0_sheet`   | The sheet name where the first table is located                                      |         | Yes      |
+| `table0_region`  | The region where the first table is defined, e.g."A1:D100"                           |         | Yes      |
+| `table0_headers` | true/false indicating whether the first row of the first table contains the header   |         | Yes      |
+| `table1_name`    | The name for the second table                                                        |         | Yes      |
+| `table1_sheet`   | The sheet name where the second table is located                                     |         | Yes      |
+| `table1_region`  | The region where the second table is defined, e.g."A1:D100"                          |         | Yes      |
+| `table1_headers` | true/false indicating whether the first  row of the second table contains the header |         | Yes      |
+| `...`            | ... (add more settings for the remainder of the tables) ...                          |         | Yes      |
 
 ## How to use
 
