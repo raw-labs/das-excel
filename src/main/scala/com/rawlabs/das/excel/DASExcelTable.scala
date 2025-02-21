@@ -40,13 +40,9 @@ class DASExcelTable(connector: DASExcelConnector, val tableConfig: ExcelTableCon
   // Build definition once
   val tableDefinition: TableDefinition = buildTableDefinition()
 
-  /**
-   * We do not support writes. So we do not define a unique column. For the same reason, path keys or sorting pushdown
-   * are minimal.
-   */
   override def getTablePathKeys: Seq[PathKey] = Seq.empty
 
-  override def getTableSortOrders(sortKeys: Seq[SortKey]): Seq[SortKey] = sortKeys
+  override def getTableSortOrders(sortKeys: Seq[SortKey]): Seq[SortKey] = Seq.empty
 
   /** Basic estimate: row count from the region, assume ~10 bytes/column. */
   override def tableEstimate(quals: Seq[Qual], columns: Seq[String]): DASTable.TableEstimate = {
