@@ -93,7 +93,6 @@ lazy val root = (project in file("."))
       "org.scalatest" %% "scalatest" % "3.2.19" % "test"))
 
 val amzn_jdk_version = "21.0.4.7-1"
-val amzn_corretto_bin = s"java-21-amazon-corretto-jdk_${amzn_jdk_version}_amd64.deb"
 val amzn_corretto_bin_dl_url = s"https://corretto.aws/downloads/resources/${amzn_jdk_version.replace('-', '.')}"
 
 lazy val dockerSettings = strictBuildSettings ++ Seq(
