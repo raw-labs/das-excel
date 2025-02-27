@@ -3,15 +3,25 @@ on:
   pull_request:
     paths:
       - .github/workflows/docker-ci.yaml
-      - .github/scripts/**
       - build.sbt
 
-env:
-  GITHUB_TOKEN: ${{ secrets.READ_PACKAGES }}
+
 
 jobs:
-  build:
-    runs-on: self-hosted
+  docker-build:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: .github/scripts/dnd-sbt docker/Docker/publishLocal
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'sbt'
+
+      - name: Build Docker image
+        env:
+          GITHUB_TOKEN: ${{ secrets.READ_PACKAGES }}
+        run: sbt docker/Docker/publishLocal

@@ -11,14 +11,16 @@ env:
 
 jobs:
   publish-jars:
-    runs-on: self-hosted
-    container:
-      image: sbtscala/scala-sbt:eclipse-temurin-jammy-21.0.2_13_1.9.9_2.12.19
-      options: --user 1001:1001
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
+    - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'sbt'
     - name: sbt publish
       run: sbt clean publish
   publish-docker-image:
@@ -29,6 +31,12 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
+    - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'sbt'
+    - uses: docker/setup-buildx-action@v3
     - uses: docker/login-action@v3
       with:
         registry: ghcr.io
@@ -36,7 +44,7 @@ jobs:
         password: ${{ secrets.WRITE_PACKAGES }}
         logout: false
     - name: publish docker images
-      run: .github/scripts/dnd-sbt docker/Docker/publish
+      run: sbt docker/Docker/publish
     - name: set should_trigger_deploy
       id: should_trigger_deploy
       shell: bash
