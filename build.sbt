@@ -121,9 +121,10 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
       && apt-get install -y --no-install-recommends \\
         curl wget ca-certificates gnupg software-properties-common fontconfig java-common \\
       && ARCH=`dpkg --print-architecture` \\
-      && wget $amzn_corretto_bin_dl_url/java-21-amazon-corretto-jdk_${amzn_jdk_version}_$$ARCH.deb \\
-      && dpkg --install java-21-amazon-corretto-jdk_${amzn_jdk_version}_$$ARCH.deb \\
-      && rm -f java-21-amazon-corretto-jdk_${amzn_jdk_version}_$$ARCH.deb \\
+      && echo "Detected architecture: $${ARCH}" \\
+      && wget $amzn_corretto_bin_dl_url/java-21-amazon-corretto-jdk_${amzn_jdk_version}_$${ARCH}.deb \\
+      && dpkg --install java-21-amazon-corretto-jdk_${amzn_jdk_version}_$${ARCH}.deb \\
+      && rm -f java-21-amazon-corretto-jdk_${amzn_jdk_version}_$${ARCH}.deb \\
       && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \\
           wget gnupg software-properties-common"""),
     Cmd("USER", "raw")),
