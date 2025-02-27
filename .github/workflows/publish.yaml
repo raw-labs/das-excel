@@ -21,6 +21,9 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'sbt'
+    - uses: sbt/setup-sbt@v1
+        with:
+          sbt-runner-version: 1.9.9
     - name: sbt publish
       run: sbt clean publish
   publish-docker-image:
@@ -36,6 +39,9 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'sbt'
+    - uses: sbt/setup-sbt@v1
+        with:
+          sbt-runner-version: 1.9.9
     - uses: docker/setup-buildx-action@v3
     - uses: docker/login-action@v3
       with:
