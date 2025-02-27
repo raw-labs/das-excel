@@ -121,15 +121,9 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
       && apt-get install -y --no-install-recommends \\
         curl wget ca-certificates gnupg software-properties-common fontconfig java-common \\
       && ARCH=`dpkg --print-architecture` \\
-      && if [ "$$ARCH" = "amd64" ]; then \\
-           wget $amzn_corretto_bin_dl_url/java-21-amazon-corretto-jdk_${amzn_jdk_version}_amd64.deb \\
-           && dpkg --install java-21-amazon-corretto-jdk_${amzn_jdk_version}_amd64.deb \\
-           && rm -f java-21-amazon-corretto-jdk_${amzn_jdk_version}_amd64.deb; \\
-         elif [ "$$ARCH" = "arm64" ]; then \\
-           wget $amzn_corretto_bin_dl_url/java-21-amazon-corretto-jdk_${amzn_jdk_version}_arm64.deb \\
-           && dpkg --install java-21-amazon-corretto-jdk_${amzn_jdk_version}_arm64.deb \\
-           && rm -f java-21-amazon-corretto-jdk_${amzn_jdk_version}_arm64.deb; \\
-         fi \\
+      && wget $amzn_corretto_bin_dl_url/java-21-amazon-corretto-jdk_${amzn_jdk_version}_$$ARCH.deb \\
+      && dpkg --install java-21-amazon-corretto-jdk_${amzn_jdk_version}_$$ARCH.deb \\
+      && rm -f java-21-amazon-corretto-jdk_${amzn_jdk_version}_$$ARCH.deb \\
       && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \\
           wget gnupg software-properties-common"""),
     Cmd("USER", "raw")),
