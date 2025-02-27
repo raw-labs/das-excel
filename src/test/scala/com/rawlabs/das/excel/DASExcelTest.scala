@@ -31,27 +31,33 @@ class DASExcelTest extends AnyFunSuite {
   // The options that replicate your environment:
   private val options: Map[String, String] = Map(
     "filename" -> excelFilePath,
-    "nr_tables" -> "4",
+    "nr_tables" -> "5",
     // TableA
     "table0_name" -> "TableA",
     "table0_sheet" -> "Sheet1",
     "table0_region" -> "A1:C4",
-    "table0_headers" -> "true",
+    "table0_header_rows" -> "1",
     // TableB
     "table1_name" -> "TableB",
     "table1_sheet" -> "Sheet1",
     "table1_region" -> "E8:F9",
-    "table1_headers" -> "false",
+    "table1_header_rows" -> "0",
     // TableC
     "table2_name" -> "TableC",
     "table2_sheet" -> "Sheet2",
     "table2_region" -> "B4:C6",
-    "table2_headers" -> "true",
+    "table2_header_rows" -> "1",
     // TableD
     "table3_name" -> "TableD",
     "table3_sheet" -> "Sheet1",
     "table3_region" -> "C14:D20",
-    "table3_headers" -> "true")
+    "table3_header_rows" -> "1",
+    // TableE
+    "table4_name" -> "TableE",
+    "table4_sheet" -> "Multi Line",
+    "table4_region" -> "A1:C5",
+    "table4_header_rows" -> "2",
+    "table4_header_joiner" -> ";")
 
   // Create the DAS instance from these options
   private val dasExcel = new DASExcel(options)
@@ -61,14 +67,15 @@ class DASExcelTest extends AnyFunSuite {
   private val tableB: Option[DASExcelTable] = dasExcel.getTable("TableB")
   private val tableC: Option[DASExcelTable] = dasExcel.getTable("TableC")
   private val tableD: Option[DASExcelTable] = dasExcel.getTable("TableD")
+  private val tableE: Option[DASExcelTable] = dasExcel.getTable("TableE")
 
   // --------------------------------------------------------------------------
   // 1) Basic presence and definitions
   // --------------------------------------------------------------------------
 
-  test("There should be exactly 4 table definitions returned") {
+  test("There should be exactly 5 table definitions returned") {
     val defs = dasExcel.tableDefinitions
-    assert(defs.size == 4, s"Expected 4 definitions, got ${defs.size}")
+    assert(defs.size == 5, s"Expected 5 definitions, got ${defs.size}")
   }
 
   test("TableA definition should exist with expected columns") {
@@ -103,11 +110,19 @@ class DASExcelTest extends AnyFunSuite {
     assert(actualNames == Seq("Column 1", "Column 2"), s"Expected columns, got $actualNames")
   }
 
+  test("TableE definition should exist with expected columns") {
+    assert(tableE.isDefined, "TableE must be defined")
+    val tableEDef = tableE.get.tableDefinition
+    val colNames = tableEDef.getColumnsList
+    val actualNames = colNames.asScala.map(_.getName)
+    assert(actualNames == Seq("First;Part", "Second;Part", "Third Part"), s"Expected columns, got $actualNames")
+  }
+
   // --------------------------------------------------------------------------
   // 2) Execution / data checks
   // --------------------------------------------------------------------------
 
-  test("TableA should have the correct rows (headers=true)") {
+  test("TableA data test") {
     val dt = tableA.get
     val execResult = dt.execute(quals = Seq.empty, columns = Seq.empty, sortKeys = Seq.empty, maybeLimit = None)
 
@@ -123,7 +138,7 @@ class DASExcelTest extends AnyFunSuite {
     assert(rowsBuffer(2).getColumnsList.asScala.map(_.getData.getString.getV) == Seq("C", "3.0", "Three"))
   }
 
-  test("TableB (headers=false) should have correct data") {
+  test("TableB data test") {
     val dt = tableB.get
     val execResult = dt.execute(quals = Seq.empty, columns = Seq.empty, sortKeys = Seq.empty, maybeLimit = None)
     val rowsBuffer = scala.collection.mutable.ArrayBuffer.empty[ProtoRow]
@@ -137,7 +152,7 @@ class DASExcelTest extends AnyFunSuite {
     assert(rowsBuffer(1).getColumnsList.asScala.map(_.getData.getString.getV) == Seq("Y", "YY"))
   }
 
-  test("TableC (headers=true) data test") {
+  test("TableC data test") {
     val dt = tableC.get
     val execResult = dt.execute(quals = Seq.empty, columns = Seq.empty, sortKeys = Seq.empty, maybeLimit = None)
     val rowsBuffer = scala.collection.mutable.ArrayBuffer.empty[ProtoRow]
@@ -151,7 +166,7 @@ class DASExcelTest extends AnyFunSuite {
     assert(rowsBuffer(1).getColumnsList.asScala.map(_.getData.getString.getV) == Seq("Miguel", "19.0"))
   }
 
-  test("TableD (headers=true) data test") {
+  test("TableD data test") {
     val dt = tableD.get
     val execResult = dt.execute(quals = Seq.empty, columns = Seq.empty, sortKeys = Seq.empty, maybeLimit = None)
     val rowsBuffer = scala.collection.mutable.ArrayBuffer.empty[ProtoRow]
@@ -167,6 +182,21 @@ class DASExcelTest extends AnyFunSuite {
     assert(rowsBuffer(3).getColumnsList.asScala.map(_.getData.getString.getV) == Seq("4.0", "Bar"))
     assert(rowsBuffer(4).getColumnsList.asScala.map(_.getData.getString.getV) == Seq("5.0", "Bar"))
     assert(rowsBuffer(5).getColumnsList.asScala.map(_.getData.getString.getV) == Seq("6.0", "Cucu"))
+  }
+
+  test("TableE data test") {
+    val dt = tableE.get
+    val execResult = dt.execute(quals = Seq.empty, columns = Seq.empty, sortKeys = Seq.empty, maybeLimit = None)
+    val rowsBuffer = scala.collection.mutable.ArrayBuffer.empty[ProtoRow]
+    while (execResult.hasNext) {
+      rowsBuffer += execResult.next()
+    }
+    execResult.close()
+
+    assert(rowsBuffer.size == 3)
+    assert(rowsBuffer(0).getColumnsList.asScala.map(_.getData.getString.getV) == Seq("1.0", "A", "X"))
+    assert(rowsBuffer(1).getColumnsList.asScala.map(_.getData.getString.getV) == Seq("2.0", "B", "Y"))
+    assert(rowsBuffer(2).getColumnsList.asScala.map(_.getData.getString.getV) == Seq("3.0", "C", "Z"))
   }
 
 }
