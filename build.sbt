@@ -123,9 +123,9 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
         curl wget ca-certificates gnupg software-properties-common fontconfig java-common \\
       && ARCH=`dpkg --print-architecture` \\
       && if [ "$$ARCH" = "amd64" ]; then \\
-           wget $amzn_corretto_bin_dl_url/$amzn_corretto_bin \\
-           && dpkg --install $amzn_corretto_bin \\
-           && rm -f $amzn_corretto_bin; \\
+           wget $amzn_corretto_bin_dl_url/java-21-amazon-corretto-jdk_${amzn_jdk_version}_amd64.deb \\
+           && dpkg --install java-21-amazon-corretto-jdk_${amzn_jdk_version}_amd64.deb \\
+           && rm -f java-21-amazon-corretto-jdk_${amzn_jdk_version}_amd64.deb; \\
          elif [ "$$ARCH" = "arm64" ]; then \\
            wget $amzn_corretto_bin_dl_url/java-21-amazon-corretto-jdk_${amzn_jdk_version}_arm64.deb \\
            && dpkg --install java-21-amazon-corretto-jdk_${amzn_jdk_version}_arm64.deb \\

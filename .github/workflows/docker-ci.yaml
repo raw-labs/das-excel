@@ -10,7 +10,7 @@ jobs:
   docker-build:
     strategy:
       matrix:
-        platform: [ubuntu-latest, ubuntu-latest-arm64]
+        platform: [ubuntu-latest, ubuntu-24.04-arm]
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
@@ -27,4 +27,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.READ_PACKAGES }}
         run: sbt docker/Docker/publishLocal
       - name: Test Docker image
-        run: docker run --rm $(docker images -q | head -n1) java -version
+        run: docker run --rm --entrypoint=/usr/bin/java $(docker images -q | head -n1) -version
