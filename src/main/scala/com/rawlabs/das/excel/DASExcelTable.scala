@@ -41,13 +41,9 @@ class DASExcelTable(connector: DASExcelConnector, val tableConfig: ExcelTableCon
   // Build a TableDefinition once, for performance.
   val tableDefinition: TableDefinition = buildTableDefinition()
 
-  /**
-   * We do not support writes, so do not define a unique key column. For the same reason, we do not push down path keys
-   * or sorting except trivially returning the input.
-   */
   override def getTablePathKeys: Seq[PathKey] = Seq.empty
 
-  override def getTableSortOrders(sortKeys: Seq[SortKey]): Seq[SortKey] = sortKeys
+  override def getTableSortOrders(sortKeys: Seq[SortKey]): Seq[SortKey] = Seq.empty
 
   /**
    * Basic table size estimate: row count from the region, ~10 bytes per column as a heuristic.
