@@ -98,7 +98,7 @@ val amzn_corretto_bin_dl_url = s"https://corretto.aws/downloads/resources/${amzn
 
 lazy val dockerSettings = strictBuildSettings ++ Seq(
   name := "das-excel-server",
-  dockerBaseImage := s"--platform=amd64 debian:bookworm-slim",
+  dockerBaseImage := "debian:bookworm-slim",
   dockerLabels ++= Map(
     "vendor" -> "RAW Labs SA",
     "product" -> "das-excel-server",
@@ -121,9 +121,16 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
       && apt-get update \\
       && apt-get install -y --no-install-recommends \\
         curl wget ca-certificates gnupg software-properties-common fontconfig java-common \\
-      && wget $amzn_corretto_bin_dl_url/$amzn_corretto_bin \\
-      && dpkg --install $amzn_corretto_bin \\
-      && rm -f $amzn_corretto_bin \\
+      && ARCH=`dpkg --print-architecture` \\
+      && if [ "$$ARCH" = "amd64" ]; then \\
+           wget $amzn_corretto_bin_dl_url/$amzn_corretto_bin \\
+           && dpkg --install $amzn_corretto_bin \\
+           && rm -f $amzn_corretto_bin; \\
+         elif [ "$$ARCH" = "arm64" ]; then \\
+           wget $amzn_corretto_bin_dl_url/java-21-amazon-corretto-jdk_${amzn_jdk_version}_arm64.deb \\
+           && dpkg --install java-21-amazon-corretto-jdk_${amzn_jdk_version}_arm64.deb \\
+           && rm -f java-21-amazon-corretto-jdk_${amzn_jdk_version}_arm64.deb; \\
+         fi \\
       && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \\
           wget gnupg software-properties-common"""),
     Cmd("USER", "raw")),

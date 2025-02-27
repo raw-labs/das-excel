@@ -25,8 +25,12 @@ jobs:
         sbt-runner-version: 1.9.9
     - name: publish
       run: sbt clean publish
+
   publish-docker-image:
-    runs-on: self-hosted
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, ubuntu-latest-arm64]
+    runs-on: ${{ matrix.platform }}
     steps:
     - uses: actions/checkout@v4
       with:
@@ -45,11 +49,12 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.WRITE_PACKAGES }}
         logout: false
-    - name: publish docker images
+    - name: Build and publish Docker image
       run: sbt docker/Docker/publish
+
   gh-release:
     needs: [publish-jars, publish-docker-image]
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
     - uses: softprops/action-gh-release@v2
       with:

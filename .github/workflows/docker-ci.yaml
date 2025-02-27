@@ -8,7 +8,10 @@ on:
 
 jobs:
   docker-build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, ubuntu-latest-arm64]
+    runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
@@ -23,3 +26,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.READ_PACKAGES }}
         run: sbt docker/Docker/publishLocal
+      - name: Test Docker image
+        run: docker run --rm $(docker images -q | head -n1) java -version
