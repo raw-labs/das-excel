@@ -5,19 +5,34 @@
 
 ## Options
 
-| Name             | Description                                                                          | Default | Required |
-|------------------|--------------------------------------------------------------------------------------|---------|----------|
-| `nr_tables`      | The number of Excel tables in the file to Expose                                     |         | Yes      |
-| `filename`       | The path to the Excel file to expose                                                 |         | Yes      |
-| `table0_name`    | The name for the first table                                                         |         | Yes      |
-| `table0_sheet`   | The sheet name where the first table is located                                      |         | Yes      |
-| `table0_region`  | The region where the first table is defined, e.g."A1:D100"                           |         | Yes      |
-| `table0_headers` | true/false indicating whether the first row of the first table contains the header   |         | Yes      |
-| `table1_name`    | The name for the second table                                                        |         | Yes      |
-| `table1_sheet`   | The sheet name where the second table is located                                     |         | Yes      |
-| `table1_region`  | The region where the second table is defined, e.g."A1:D100"                          |         | Yes      |
-| `table1_headers` | true/false indicating whether the first  row of the second table contains the header |         | Yes      |
-| `...`            | ... (add more settings for the remainder of the tables) ...                          |         | Yes      |
+| Name                    | Description                                                                                                 | Default | Required |
+|-------------------------|-------------------------------------------------------------------------------------------------------------|---------|----------|
+| `nr_tables`             | The number of Excel tables in the file to expose                                                            |         | Yes      |
+| `filename`              | The path to the Excel file to expose                                                                        |         | Yes      |
+| `table0_name`           | The name for the first table                                                                                |         | Yes      |
+| `table0_sheet`          | The sheet name where the first table is located                                                             |         | Yes      |
+| `table0_region`         | The region where the first table is defined (e.g. `"A1:D100"`)                                              |         | Yes      |
+| `table0_header_rows`    | Number of top rows **within the region** that are treated as multi-line headers (0 = none, 1 = single-line) | `0`     | No       |
+| `table0_header_joiner`  | The string used to join multiple header lines if `table0_header_rows` > 1                                   | `-`     | No       |
+| `table1_name`           | The name for the second table                                                                               |         | Yes      |
+| `table1_sheet`          | The sheet name where the second table is located                                                            |         | Yes      |
+| `table1_region`         | The region where the second table is defined                                                                |         | Yes      |
+| `table1_header_rows`    | Same as above, for the second table                                                                         | `0`     | No       |
+| `table1_header_joiner`  | Same as above, for the second table                                                                         | `-`     | No       |
+| `...`                   | ... (add more settings for any additional tables in the same pattern) ...                                   |         |          |
+
+### About Headers
+
+- **`tableX_header_rows`**:
+    - An integer specifying how many of the top rows in the region should be combined into column headers.
+    - If `0`, all columns in that region are auto-named as `A`, `B`, `C`, etc.
+    - If `1`, exactly one row of headers is used.
+    - If `>1`, multiple rows are merged into one “multi-line” header, joined by `tableX_header_joiner`.
+
+- **`tableX_header_joiner`**:
+    - A string that defines how multiple lines of headers are concatenated.
+    - Defaults to `-` (dash).
+    - Only meaningful if `tableX_header_rows` > 1.
 
 ## How to use
 
