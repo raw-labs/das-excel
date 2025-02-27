@@ -13,12 +13,13 @@
 package com.rawlabs.das.excel
 
 import java.io.File
+
 import org.apache.poi.ss.usermodel.{Workbook, WorkbookFactory}
+
 import com.typesafe.scalalogging.StrictLogging
 
 /**
- * Manages the lifetime of the Excel file handle.
- * Currently we open once and do not close explicitly.
+ * Manages the lifetime of the Excel file handle. Currently we open once and do not close explicitly.
  */
 class DASExcelConnector(excelOptions: DASExcelOptions) extends StrictLogging {
 
