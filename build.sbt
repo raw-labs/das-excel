@@ -3,7 +3,7 @@ import SbtDASPlugin.autoImport.*
 lazy val root = (project in file("."))
   .enablePlugins(SbtDASPlugin)
   .settings(
-    repoNameSetting := "das-salesforce",
+    repoNameSetting := "das-excel",
     libraryDependencies ++= Seq(
       "com.raw-labs" %% "das-server-scala" % "0.6.0" % "compile->compile;test->test",
       // Apache POI for reading Excel files
