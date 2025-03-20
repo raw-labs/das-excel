@@ -11,4 +11,7 @@ lazy val root = (project in file("."))
       "org.apache.poi" % "poi" % "5.4.0",
       "org.apache.poi" % "poi-ooxml" % "5.4.0",
       // Scalatest
-      "org.scalatest" %% "scalatest" % "3.2.19" % "test"))
+      "org.scalatest" %% "scalatest" % "3.2.19" % "test"),
+    dependencyOverrides ++= Seq(
+      "io.netty" % "netty-handler" % "4.1.118.Final"
+    ))
